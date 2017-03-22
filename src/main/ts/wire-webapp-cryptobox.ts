@@ -13,6 +13,7 @@ export default {
   InvalidPreKeyFormatError: InvalidPreKeyFormatError,
   store: {
     Cache,
+    File,
     IndexedDB,
     ReadOnlyStore,
     RecordAlreadyExistsError,

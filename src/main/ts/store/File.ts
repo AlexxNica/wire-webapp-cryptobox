@@ -62,7 +62,7 @@ export default class File implements CryptoboxStore {
   }
 
   update_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
-    return undefined;
+    return this.create_session(session_id, session);
   }
 
   delete_session(session_id: string): Promise<string> {
