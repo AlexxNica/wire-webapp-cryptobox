@@ -1,7 +1,7 @@
-import * as Proteus from "wire-webapp-proteus";
-import {CryptoboxStore} from "./CryptoboxStore";
 import * as fs from "fs";
 import * as path from "path";
+import * as Proteus from "wire-webapp-proteus";
+import {CryptoboxStore} from "./CryptoboxStore";
 
 export default class File implements CryptoboxStore {
   private storePath: string;

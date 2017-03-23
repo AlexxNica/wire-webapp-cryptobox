@@ -166,7 +166,7 @@ gulp.task('test_node', function() {
   ];
 
   if (file) {
-    tests = [`test/js/specs/${file}`]
+    tests = [`test/${file}`]
   }
 
   return gulp.src(tests)
