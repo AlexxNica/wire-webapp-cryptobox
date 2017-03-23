@@ -1,4 +1,5 @@
 import Cache from "./store/Cache";
+import File from "./store/File";
 import IndexedDB from "./store/IndexedDB";
 import {CryptoboxSession} from "./CryptoboxSession";
 import {Cryptobox} from "./Cryptobox";

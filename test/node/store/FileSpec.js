@@ -23,6 +23,8 @@ const fs = require('fs');
 // gulp test_node --file "node/store/FileSpec.js"
 describe('cryptobox.store.File', () => {
   const testStoragePath = `${__dirname}/test`;
+  const id = 'wire/production/062418ea-9b93-4d93-b59b-11aba3f702d8/permanent';
+  const cryptoboxPath = `${testStoragePath}/${id}`;
 
   beforeAll(done => {
     fs.stat(testStoragePath, (error) => {
@@ -46,8 +48,8 @@ describe('cryptobox.store.File', () => {
 
   describe('constructor', () => {
     it('constructs a file storage with a given storage path', () => {
-      console.log('A', __dirname);
-      expect('A').toBe('A');
+      const fileStore = new cryptobox.store.File(cryptoboxPath);
+      expect(fileStore.storagePath).toBeDefined();
     });
   });
 

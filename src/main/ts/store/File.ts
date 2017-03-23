@@ -4,10 +4,10 @@ import * as Proteus from "wire-webapp-proteus";
 import {CryptoboxStore} from "./CryptoboxStore";
 
 export default class File implements CryptoboxStore {
-  private storePath: string;
+  private storagePath: string;
 
-  constructor(id: string, storePath: string) {
-    this.storePath = path.join(storePath, id);
+  constructor(storagePath: string) {
+    this.storagePath =  path.normalize(storagePath);
   }
 
   delete_all(): Promise<boolean> {
@@ -43,7 +43,7 @@ export default class File implements CryptoboxStore {
   }
 
   create_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
-    const file: string = path.join(this.storePath, session_id);
+    const file: string = path.join(this.storagePath, session_id);
     const serializedSession: Buffer = new Buffer(session.serialise());
 
     return new Promise((resolve, reject) => {
