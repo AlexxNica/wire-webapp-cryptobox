@@ -3,7 +3,7 @@ import {CryptoboxStore} from "./CryptoboxStore";
 import {SerialisedRecord} from "./SerialisedRecord";
 import {RecordNotFoundError} from "./RecordNotFoundError";
 
-export abstract class AbstractCryptoboxStore implements CryptoboxStore {
+export abstract class CryptoboxCRUDStore implements CryptoboxStore {
   static get KEYS() {
     return {
       LOCAL_IDENTITY: "local_identity"
@@ -27,7 +27,7 @@ export abstract class AbstractCryptoboxStore implements CryptoboxStore {
   abstract delete_all(): Promise<boolean>;
 
   delete_prekey(prekey_id: number): Promise<number> {
-    return this.delete(AbstractCryptoboxStore.STORES.PRE_KEYS, prekey_id.toString())
+    return this.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
       .then(() => {
         return prekey_id;
       });
@@ -35,7 +35,7 @@ export abstract class AbstractCryptoboxStore implements CryptoboxStore {
 
   load_identity(): Promise<Proteus.keys.IdentityKeyPair> {
     return new Promise((resolve, reject) => {
-      this.read(AbstractCryptoboxStore.STORES.LOCAL_IDENTITY, AbstractCryptoboxStore.KEYS.LOCAL_IDENTITY)
+      this.read(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY)
         .then((record: SerialisedRecord) => {
           const identity: Proteus.keys.IdentityKeyPair = Proteus.keys.IdentityKeyPair.deserialise(record.serialised);
           resolve(identity);
@@ -59,9 +59,9 @@ export abstract class AbstractCryptoboxStore implements CryptoboxStore {
   }
 
   save_identity(identity: Proteus.keys.IdentityKeyPair): Promise<Proteus.keys.IdentityKeyPair> {
-    const payload: SerialisedRecord = new SerialisedRecord(identity.serialise(), AbstractCryptoboxStore.KEYS.LOCAL_IDENTITY);
+    const payload: SerialisedRecord = new SerialisedRecord(identity.serialise(), CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
 
-    return this.create(AbstractCryptoboxStore.STORES.LOCAL_IDENTITY, payload.id, payload)
+    return this.create(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, payload.id, payload)
       .then(() => {
         return identity;
       });
@@ -70,7 +70,7 @@ export abstract class AbstractCryptoboxStore implements CryptoboxStore {
   save_prekey(pre_key: Proteus.keys.PreKey): Promise<Proteus.keys.PreKey> {
     const payload: SerialisedRecord = new SerialisedRecord(pre_key.serialise(), pre_key.key_id.toString());
 
-    return this.create(AbstractCryptoboxStore.STORES.PRE_KEYS, payload.id, payload)
+    return this.create(CryptoboxCRUDStore.STORES.PRE_KEYS, payload.id, payload)
       .then(() => {
         return pre_key;
       });

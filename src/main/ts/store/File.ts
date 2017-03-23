@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import Logdown = require('logdown');
-import {AbstractCryptoboxStore} from "./AbstractCryptoboxStore";
+import {CryptoboxCRUDStore} from "./CryptoboxCRUDStore";
 import {SerialisedRecord} from "./SerialisedRecord";
 
-export default class File extends AbstractCryptoboxStore {
+export default class File extends CryptoboxCRUDStore {
   private logger: Logdown;
   private storagePath: string;
 
