@@ -14,9 +14,13 @@ module.exports = {
   externals: {
     'bazinga64': true,
     'dexie': 'Dexie',
+    'fs': false,
     'logdown': 'Logdown',
     'wire-webapp-lru-cache': 'LRUCache',
     'wire-webapp-proteus': 'Proteus'
+  },
+  node: {
+    fs: 'empty'
   },
   plugins: [
     new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)
