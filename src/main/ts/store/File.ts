@@ -8,9 +8,8 @@ export default class File extends CryptoboxCRUDStore {
   private logger: Logdown;
   private storagePath: string;
 
-  constructor(storagePath: string) {
+  constructor() {
     super();
-    this.storagePath = path.normalize(storagePath);
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.File'});
   }
 
@@ -24,6 +23,34 @@ export default class File extends CryptoboxCRUDStore {
           return reject(error);
         } else {
           return resolve(file);
+        }
+      });
+    });
+  }
+
+  // TODO: Recursive directory creation is not implemented yet.
+  init(identifier: string): Promise<CryptoboxCRUDStore> {
+    this.storagePath = path.normalize(identifier);
+    const directory = this.storagePath;
+
+    this.logger.log(`Initializing Cryptobox storage in directory "${directory}"...`);
+
+    return new Promise((resolve, reject) => {
+      fs.stat(directory, (error) => {
+        if (error) {
+          if (error.code === 'ENOENT') {
+            fs.mkdir(directory, (error) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(this);
+              }
+            });
+          } else {
+            reject(error);
+          }
+        } else {
+          resolve(this);
         }
       });
     });
@@ -60,7 +87,7 @@ export default class File extends CryptoboxCRUDStore {
   }
 
   delete_all(): Promise<boolean> {
-    const dir = this.storagePath;
+    const dir: string = this.storagePath;
     return new Promise((resolve, reject) => {
       fs.access(dir, error => {
         if (error) {

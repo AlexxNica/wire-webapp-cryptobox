@@ -26,6 +26,8 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
 
   abstract delete_all(): Promise<boolean>;
 
+  abstract init(identifier: string): Promise<CryptoboxCRUDStore>;
+
   delete_prekey(prekey_id: number): Promise<number> {
     return this.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
       .then(() => {
