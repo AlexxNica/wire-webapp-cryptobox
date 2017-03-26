@@ -8,9 +8,10 @@ export default class File extends CryptoboxCRUDStore {
   private logger: Logdown;
   private storagePath: string;
 
-  constructor() {
+  constructor(storagePath?: string) {
     super();
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.File'});
+    this.storagePath = storagePath;
   }
 
   create(store_name: string, primary_key: string, entity: SerialisedRecord) {

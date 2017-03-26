@@ -22,7 +22,7 @@ const fs = require('fs');
 const Proteus = require('wire-webapp-proteus');
 
 // gulp test_node --file "node/store/FileSpec.js"
-xdescribe('cryptobox.store.File', () => {
+describe('cryptobox.store.File', () => {
   const testStoragePath = `${__dirname}/test`;
   const id = 'wire/production/062418ea-9b93-4d93-b59b-11aba3f702d8/permanent';
   const cryptoboxPath = `${testStoragePath}/${id}`;
@@ -59,7 +59,7 @@ xdescribe('cryptobox.store.File', () => {
     });
   });
 
-  describe('save_identity', () => {
+  xdescribe('save_identity', () => {
     it('saves an identity', (done) => {
       const identity = Proteus.keys.IdentityKeyPair.new();
       fileStore.save_identity(identity)
