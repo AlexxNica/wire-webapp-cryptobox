@@ -20,7 +20,8 @@ module.exports = {
     'wire-webapp-proteus': 'Proteus'
   },
   node: {
-    fs: 'empty'
+    fs: 'empty',
+    path: 'empty'
   },
   plugins: [
     new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)
