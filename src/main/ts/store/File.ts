@@ -106,20 +106,21 @@ export default class File extends CryptoboxCRUDStore {
   }
 
   delete_all(): Promise<boolean> {
-    const dir: string = this.storagePath;
+    const directory: string = this.storagePath;
+
     return new Promise((resolve, reject) => {
-      fs.access(dir, error => {
+      fs.access(directory, error => {
         if (error) {
           return reject(error);
         }
-        fs.readdir(dir, (error, files) => {
+        fs.readdir(directory, (error, files) => {
           if (error) {
             return reject(error);
           }
-          Promise.all(files.map(function (file) {
-            return this.delete(dir, file);
+          Promise.all(files.map((file) => {
+            return this.delete(directory, file);
           })).then(() => {
-            fs.rmdir(dir, error => {
+            fs.rmdir(directory, error => {
               if (error) {
                 return reject(error);
               }

@@ -31,6 +31,10 @@ describe('cryptobox.store.File', () => {
     fileStore.init(storagePath).then(done);
   });
 
+  afterEach((done) => {
+    fileStore.delete_all().then(done);
+  });
+
   describe('constructor', () => {
     it('constructs a file storage with a given storage path', () => {
       expect(fileStore.storagePath).toBeDefined();
