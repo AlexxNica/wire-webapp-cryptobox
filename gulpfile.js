@@ -28,7 +28,6 @@ var gulpif = require('gulp-if');
 var gulpTypings = require('gulp-typings');
 var gutil = require('gulp-util');
 var Jasmine = require('jasmine');
-var karma = require('karma');
 var merge = require('merge2');
 var ProgressPlugin = require('webpack/lib/ProgressPlugin');
 var replace = require('gulp-replace');
@@ -135,6 +134,8 @@ gulp.task('test', function(done) {
 
 // gulp test_browser -file "yourspec"
 gulp.task('test_browser', function(done) {
+  var karma = require('karma');
+
   gutil.log(gutil.colors.yellow('Running tests in Google Chrome:'));
   var file = process.argv[4];
 
