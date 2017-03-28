@@ -27,7 +27,7 @@ var gulp = require('gulp');
 var gulpif = require('gulp-if');
 var gulpTypings = require('gulp-typings');
 var gutil = require('gulp-util');
-var jasmine = require('gulp-jasmine');
+var Jasmine = require('jasmine');
 var karma = require('karma');
 var merge = require('merge2');
 var ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -155,23 +155,39 @@ gulp.task('test_browser', function(done) {
   server.start();
 });
 
-gulp.task('test_node', function() {
+gulp.task('test_node', function(done) {
   gutil.log(gutil.colors.yellow('Running tests on Node.js:'));
 
   var file = process.argv[4];
 
   var tests = [
-    'test/common/**/*Spec.js',
-    'test/node/**/*Spec.js'
+    'common/**/*Spec.js',
+    'node/**/*Spec.js'
   ];
 
   if (file) {
-    tests = [`test/${file}`]
+    tests = [file]
   }
 
-  return gulp.src(tests)
-    .pipe(jasmine({
-      random: true,
-      stopSpecOnExpectationFailure: true
-    }));
+  var jasmine = new Jasmine();
+
+  var config = {
+    random: true,
+    spec_dir: 'test',
+    spec_files: tests,
+    stopSpecOnExpectationFailure: true,
+  };
+
+  jasmine.loadConfig(config);
+
+  jasmine.onComplete(function(passed) {
+    if (passed) {
+      done();
+    }
+    else {
+      done(new Error('At least one spec has failed.'));
+    }
+  });
+
+  jasmine.execute();
 });
