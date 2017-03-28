@@ -8,18 +8,18 @@ export default class File extends CryptoboxCRUDStore {
   private logger: Logdown;
   private storagePath: string;
 
-  constructor(storagePath?: string) {
+  constructor() {
     super();
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.File'});
-    this.storagePath = storagePath;
   }
 
   create(store_name: string, primary_key: string, entity: SerialisedRecord) {
     this.logger.log(`Creating record "${primary_key}" in directory "${store_name}"...`, entity);
-    const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.json`);
+    const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
 
     return new Promise((resolve, reject) => {
-      fs.writeFile(file, entity.serialised, {encoding: "utf8", flag: "w+"}, (error) => {
+      const base64EncodedData = new Buffer(entity.serialised).toString('base64');
+      fs.writeFile(file, base64EncodedData, (error) => {
         if (error) {
           return reject(error);
         } else {
@@ -29,13 +29,7 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
-  // TODO: Recursive directory creation is not implemented yet.
-  init(identifier: string): Promise<CryptoboxCRUDStore> {
-    this.storagePath = path.normalize(identifier);
-    const directory = this.storagePath;
-
-    this.logger.log(`Initializing Cryptobox storage in directory "${directory}"...`);
-
+  private createDirectory(directory: string): Promise<string> {
     return new Promise((resolve, reject) => {
       fs.stat(directory, (error) => {
         if (error) {
@@ -44,17 +38,38 @@ export default class File extends CryptoboxCRUDStore {
               if (error) {
                 reject(error);
               } else {
-                resolve(this);
+                resolve(directory);
               }
             });
           } else {
             reject(error);
           }
         } else {
-          resolve(this);
+          resolve(directory);
         }
       });
     });
+  }
+
+  // TODO: Recursive directory creation is not implemented yet.
+  init(storagePath: string): Promise<CryptoboxCRUDStore> {
+    this.storagePath = path.normalize(storagePath);
+
+    this.logger.log(`Initializing Cryptobox storage in directory "${this.storagePath}"...`);
+
+    return this.createDirectory(this.storagePath)
+      .then(() => {
+        return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.PRE_KEYS));
+      })
+      .then(() => {
+        return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.SESSIONS));
+      })
+      .then(() => {
+        return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
+      })
+      .then(() => {
+        return this;
+      });
   }
 
   read(store_name: string, primary_key: string): Promise<Object> {

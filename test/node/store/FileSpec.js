@@ -23,43 +23,21 @@ const Proteus = require('wire-webapp-proteus');
 
 // gulp test_node --file "node/store/FileSpec.js"
 describe('cryptobox.store.File', () => {
-  const testStoragePath = `${__dirname}/test`;
-  const id = 'wire/production/062418ea-9b93-4d93-b59b-11aba3f702d8/permanent';
-  const cryptoboxPath = `${testStoragePath}/${id}`;
+  const storagePath = `${__dirname}/test`;
   let fileStore = undefined;
 
-  beforeAll(done => {
-    fs.stat(testStoragePath, (error) => {
-      if (error) {
-        if (error.code === 'ENOENT') {
-          fs.mkdir(testStoragePath, (error) => {
-            if (error) {
-              done.fail(error);
-            } else {
-              done();
-            }
-          });
-        } else {
-          done.fail(error);
-        }
-      } else {
-        done();
-      }
-    });
-  });
-
-  beforeEach(() => {
-    fileStore = new cryptobox.store.File(cryptoboxPath);
+  beforeEach((done) => {
+    fileStore = new cryptobox.store.File();
+    fileStore.init(storagePath).then(done);
   });
 
   describe('constructor', () => {
     it('constructs a file storage with a given storage path', () => {
-      const fileStore = new cryptobox.store.File(cryptoboxPath);
       expect(fileStore.storagePath).toBeDefined();
     });
   });
 
-  xdescribe('save_identity', () => {
+  describe('save_identity', () => {
     it('saves an identity', (done) => {
       const identity = Proteus.keys.IdentityKeyPair.new();
       fileStore.save_identity(identity)
@@ -67,5 +45,4 @@ describe('cryptobox.store.File', () => {
         .catch(done.fail);
     })
   });
-
 });
