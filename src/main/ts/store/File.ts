@@ -105,8 +105,20 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
-  delete_all(): Promise<boolean> {
-    const directory: string = this.storagePath;
+  private deleteDirectory(directory: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      fs.rmdir(directory, (error) => {
+        if (error) {
+          return reject(error);
+        } else {
+          return resolve(directory);
+        }
+      });
+    });
+  }
+
+  delete_all(currentDirectory: string): Promise<boolean> {
+    const directory: string = currentDirectory || this.storagePath;
 
     return new Promise((resolve, reject) => {
       fs.access(directory, error => {
@@ -118,7 +130,13 @@ export default class File extends CryptoboxCRUDStore {
             return reject(error);
           }
           Promise.all(files.map((file) => {
-            return this.delete(directory, file);
+            const stats = fs.lstatSync(path.join(directory, file));
+            if (stats.isFile()) {
+              return this.delete(directory, file);
+            } else {
+              // TODO: Delete directory (but delete files inside this directory too!)
+              return;
+            }
           })).then(() => {
             fs.rmdir(directory, error => {
               if (error) {
