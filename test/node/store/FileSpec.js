@@ -38,10 +38,19 @@ describe('cryptobox.store.File', () => {
   });
 
   describe('save_identity', () => {
-    it('saves an identity', (done) => {
+    it('serializes an identity which can be deserialized', (done) => {
       const identity = Proteus.keys.IdentityKeyPair.new();
+      const fingerprint = identity.public_key.fingerprint();
+
       fileStore.save_identity(identity)
-        .then(done)
+        .then((local_identity) => {
+          expect(local_identity).toBeDefined();
+          return fileStore.load_identity();
+        })
+        .then((loaded_identity) => {
+          expect(loaded_identity.public_key.fingerprint()).toBe(fingerprint);
+          done();
+        })
         .catch(done.fail);
     })
   });

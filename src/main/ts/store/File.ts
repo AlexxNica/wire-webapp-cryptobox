@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import Logdown = require('logdown');
+import Logdown = require("logdown");
 import {CryptoboxCRUDStore} from "./CryptoboxCRUDStore";
 import {SerialisedRecord} from "./SerialisedRecord";
 
@@ -10,16 +10,16 @@ export default class File extends CryptoboxCRUDStore {
 
   constructor() {
     super();
-    this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.File'});
+    this.logger = new Logdown({alignOutput: true, markdown: false, prefix: "cryptobox.store.File"});
   }
 
-  create(store_name: string, primary_key: string, entity: SerialisedRecord) {
-    this.logger.log(`Creating record "${primary_key}" in directory "${store_name}"...`, entity);
+  create(store_name: string, primary_key: string, record: SerialisedRecord) {
+    this.logger.log(`Creating record "${primary_key}" in directory "${store_name}"...`, record);
     const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
 
     return new Promise((resolve, reject) => {
-      const base64EncodedData = new Buffer(entity.serialised).toString('base64');
-      fs.writeFile(file, base64EncodedData, (error) => {
+      const base64EncodedData = new Buffer(record.serialised).toString("base64");
+      fs.writeFile(file, base64EncodedData, {encoding: "utf8", flag: "w"}, (error) => {
         if (error) {
           return reject(error);
         } else {
@@ -33,7 +33,7 @@ export default class File extends CryptoboxCRUDStore {
     return new Promise((resolve, reject) => {
       fs.stat(directory, (error) => {
         if (error) {
-          if (error.code === 'ENOENT') {
+          if (error.code === "ENOENT") {
             fs.mkdir(directory, (error) => {
               if (error) {
                 reject(error);
@@ -72,16 +72,19 @@ export default class File extends CryptoboxCRUDStore {
       });
   }
 
-  read(store_name: string, primary_key: string): Promise<Object> {
+  read(store_name: string, primary_key: string): Promise<SerialisedRecord> {
     this.logger.log(`Reading record with primary key "${primary_key}" from directory "${store_name}"...`);
-    const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.json`);
+    const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
 
     return new Promise((resolve, reject) => {
-      fs.readFile(file, {encoding: 'utf8', flag: 'r'}, function (error, data) {
+      fs.readFile(file, {encoding: "utf8", flag: "r"}, function (error, data) {
         if (error) {
           reject(error);
         } else {
-          resolve(JSON.parse(data));
+          const decodedData: Buffer = Buffer.from(data, "base64");
+          const serialised: ArrayBuffer = new Uint8Array(decodedData).buffer;
+          const record: SerialisedRecord = new SerialisedRecord(serialised, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
+          resolve(record);
         }
       });
     });

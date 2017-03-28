@@ -38,6 +38,7 @@ var webpack = require('webpack');
 
 // Aliases
 gulp.task('b', ['build']);
+gulp.task('bn', ['build_ts_node']);
 gulp.task('c', ['clean']);
 gulp.task('i', ['install']);
 gulp.task('t', ['test']);

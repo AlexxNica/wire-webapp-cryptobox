@@ -20,7 +20,7 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
 
   abstract create(store_name: string, primary_key: string, entity: SerialisedRecord): Promise<string>;
 
-  abstract read(store_name: string, primary_key: string): Promise<Object>;
+  abstract read(store_name: string, primary_key: string): Promise<SerialisedRecord>;
 
   abstract delete(store_name: string, primary_key: string): Promise<string>;
 
