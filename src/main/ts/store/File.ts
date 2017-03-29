@@ -36,16 +36,10 @@ export default class File extends CryptoboxCRUDStore {
 
   private createDirectory(directory: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      fs.stat(directory, (error) => {
+      fs.mkdir(directory, (error) => {
         if (error) {
-          if (error.code === "ENOENT") {
-            fs.mkdir(directory, (error) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve(directory);
-              }
-            });
+          if (error.code === 'EEXIST') {
+            resolve(directory);
           } else {
             reject(error);
           }
