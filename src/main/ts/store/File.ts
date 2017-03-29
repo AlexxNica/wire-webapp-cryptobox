@@ -13,7 +13,7 @@ export default class File extends CryptoboxCRUDStore {
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: "cryptobox.store.File"});
   }
 
-  create(store_name: string, primary_key: string, record: SerialisedRecord) {
+  create(store_name: string, primary_key: string, record: SerialisedRecord): Promise<string> {
     this.logger.log(`Creating record "${primary_key}" in directory "${store_name}"...`, record);
     const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
 
@@ -51,7 +51,12 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
-  // TODO: Recursive directory creation is not implemented yet.
+  update(store_name: string, primary_key: string, changes: any): Promise<string> {
+    const updatedRecord = new SerialisedRecord(changes.serialised, primary_key);
+    return this.create(store_name, primary_key, updatedRecord);
+  }
+
+  // TODO: Recursive directory creation is not yet implemented.
   init(storagePath: string): Promise<CryptoboxCRUDStore> {
     this.storagePath = path.normalize(storagePath);
 

@@ -20,13 +20,16 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
 
   abstract create(store_name: string, primary_key: string, entity: SerialisedRecord): Promise<string>;
 
-  abstract read(store_name: string, primary_key: string): Promise<SerialisedRecord>;
-
   abstract delete(store_name: string, primary_key: string): Promise<string>;
 
   abstract delete_all(): Promise<boolean>;
 
   abstract init(identifier: string): Promise<CryptoboxCRUDStore>;
+
+  abstract read(store_name: string, primary_key: string): Promise<SerialisedRecord>;
+
+  // TODO: Define the format of "Object"!
+  abstract update(store_name: string, primary_key: string, changes: any): Promise<string>;
 
   delete_prekey(prekey_id: number): Promise<number> {
     return this.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
@@ -53,7 +56,19 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey> {
-    return undefined;
+    return new Promise((resolve, reject) => {
+      this.read(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
+        .then((record: SerialisedRecord) => {
+          resolve(Proteus.keys.PreKey.deserialise(record.serialised));
+        })
+        .catch(function (error: Error) {
+          if (error instanceof RecordNotFoundError) {
+            resolve(undefined);
+          } else {
+            reject(error);
+          }
+        });
+    });
   }
 
   load_prekeys(): Promise<Array<Proteus.keys.PreKey>> {
@@ -83,18 +98,36 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   create_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
-    return undefined;
+    const payload: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
+
+    return this.create(CryptoboxCRUDStore.STORES.SESSIONS, payload.id, payload)
+      .then(() => {
+        return session;
+      });
   }
 
   read_session(identity: Proteus.keys.IdentityKeyPair, session_id: string): Promise<Proteus.session.Session> {
-    return undefined;
+    return this.read(CryptoboxCRUDStore.STORES.SESSIONS, session_id)
+      .then((payload: SerialisedRecord) => {
+        return Proteus.session.Session.deserialise(identity, payload.serialised);
+      });
   }
 
   update_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
-    return undefined;
+    const payload: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
+
+    return this.update(CryptoboxCRUDStore.STORES.SESSIONS, payload.id, {serialised: payload.serialised})
+      .then(() => {
+        return session;
+      });
   }
 
   delete_session(session_id: string): Promise<string> {
-    return undefined;
+    return new Promise((resolve) => {
+      this.delete(CryptoboxCRUDStore.STORES.SESSIONS, session_id)
+        .then((primary_key: string) => {
+          resolve(primary_key);
+        });
+    });
   }
 }
