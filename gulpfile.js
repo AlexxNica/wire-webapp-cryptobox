@@ -42,6 +42,8 @@ gulp.task('bn', ['build_ts_node']);
 gulp.task('c', ['clean']);
 gulp.task('i', ['install']);
 gulp.task('t', ['test']);
+gulp.task('tb', ['test_browser']);
+gulp.task('tn', ['test_node']);
 
 // Tasks
 gulp.task('clean', ['clean_browser', 'clean_node'], function() {

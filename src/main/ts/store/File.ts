@@ -3,6 +3,7 @@ import * as path from "path";
 import Logdown = require("logdown");
 import {CryptoboxCRUDStore} from "./CryptoboxCRUDStore";
 import {SerialisedRecord} from "./SerialisedRecord";
+import {SerialisedUpdate} from "./SerialisedUpdate";
 
 export default class File extends CryptoboxCRUDStore {
   private logger: Logdown;
@@ -51,7 +52,7 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
-  update(store_name: string, primary_key: string, changes: any): Promise<string> {
+  update(store_name: string, primary_key: string, changes: SerialisedUpdate): Promise<string> {
     const updatedRecord = new SerialisedRecord(changes.serialised, primary_key);
     return this.create(store_name, primary_key, updatedRecord);
   }

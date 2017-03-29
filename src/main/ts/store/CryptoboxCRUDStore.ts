@@ -1,7 +1,8 @@
 import * as Proteus from "wire-webapp-proteus";
 import {CryptoboxStore} from "./CryptoboxStore";
-import {SerialisedRecord} from "./SerialisedRecord";
 import {RecordNotFoundError} from "./RecordNotFoundError";
+import {SerialisedRecord} from "./SerialisedRecord";
+import {SerialisedUpdate} from "./SerialisedUpdate";
 
 export abstract class CryptoboxCRUDStore implements CryptoboxStore {
   static get KEYS() {
@@ -28,8 +29,7 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
 
   abstract read(store_name: string, primary_key: string): Promise<SerialisedRecord>;
 
-  // TODO: Define the format of "Object"!
-  abstract update(store_name: string, primary_key: string, changes: any): Promise<string>;
+  abstract update(store_name: string, primary_key: string, changes: SerialisedUpdate): Promise<string>;
 
   delete_prekey(prekey_id: number): Promise<number> {
     return this.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
