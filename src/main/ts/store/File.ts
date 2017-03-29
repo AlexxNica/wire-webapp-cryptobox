@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import Logdown = require("logdown");
 import {CryptoboxCRUDStore} from "./CryptoboxCRUDStore";
+import {RecordNotFoundError} from "./RecordNotFoundError";
 import {SerialisedRecord} from "./SerialisedRecord";
 import {SerialisedUpdate} from "./SerialisedUpdate";
 
@@ -96,7 +97,12 @@ export default class File extends CryptoboxCRUDStore {
     return new Promise((resolve, reject) => {
       fs.readFile(file, {encoding: "utf8", flag: "r"}, function (error, data) {
         if (error) {
-          reject(error);
+          if (error.code === 'ENOENT') {
+            let message: string = `Record "${primary_key}" from file "${file}" could not be found.`;
+            reject(new RecordNotFoundError(message));
+          } else {
+            reject(error);
+          }
         } else {
           const decodedData: Buffer = Buffer.from(data, "base64");
           const serialised: ArrayBuffer = new Uint8Array(decodedData).buffer;

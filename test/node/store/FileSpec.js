@@ -67,17 +67,15 @@ describe('cryptobox.store.File', () => {
         const alice = new cryptobox.Cryptobox(fileStore, 1);
         const sessionId = 'session_with_bob';
 
-        done();
+        const bob = Proteus.keys.IdentityKeyPair.new();
+        const preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+        const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
 
-        // const bob = Proteus.keys.IdentityKeyPair.new();
-        // const preKey = new Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-        // const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
-        //
-        // alice.init()
-        //   .then(function(allPreKeys) {
-        //     expect(allPreKeys.length).toBe(1);
-        //     done();
-        //   });
+        alice.init()
+          .then(function(allPreKeys) {
+            expect(allPreKeys.length).toBe(1);
+            done();
+          });
       })
     });
   });

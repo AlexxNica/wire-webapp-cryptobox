@@ -74,7 +74,7 @@ export class Cryptobox extends EventEmitter {
           this.logger.log(`Found existing local identity.`, identity);
           return identity;
         } else {
-          identity = Proteus.keys.IdentityKeyPair.new();
+          const identity: Proteus.keys.IdentityKeyPair = Proteus.keys.IdentityKeyPair.new();
           this.logger.warn(`No existing local identity found. Created new local identity.`, identity);
           return this.save_new_identity(identity);
         }
