@@ -152,7 +152,7 @@ describe('cryptobox.store.IndexedDB', function() {
       var alice = Proteus.keys.IdentityKeyPair.new();
 
       var bob = Proteus.keys.IdentityKeyPair.new();
-      var preKey = new Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      var preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
       var bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
 
       var sessionId = 'session_with_bob';
@@ -186,7 +186,7 @@ describe('cryptobox.store.IndexedDB', function() {
       var sessionId = 'session_with_bob';
 
       var bob = Proteus.keys.IdentityKeyPair.new();
-      var preKey = new Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      var preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
       var bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
 
       alice.init()
