@@ -88,7 +88,8 @@ describe('cryptobox.store.File', () => {
           .then(function(savedPreKeys) {
             expect(savedPreKeys.length).toBe(preKeys.length);
             done();
-          });
+          })
+          .catch(done.fail);
       });
     });
   });
@@ -107,7 +108,8 @@ describe('cryptobox.store.File', () => {
           .then(function(allPreKeys) {
             expect(allPreKeys.length).toBe(1);
             done();
-          });
+          })
+          .catch(done.fail);
       })
     });
   });

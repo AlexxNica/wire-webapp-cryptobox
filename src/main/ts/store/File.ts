@@ -74,13 +74,13 @@ export default class File extends CryptoboxCRUDStore {
 
     return this.createDirectory(this.storagePath)
       .then(() => {
+        return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
+      })
+      .then(() => {
         return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.PRE_KEYS));
       })
       .then(() => {
         return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.SESSIONS));
-      })
-      .then(() => {
-        return this.createDirectory(path.join(this.storagePath, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
       })
       .then(() => {
         return this;
@@ -196,13 +196,13 @@ export default class File extends CryptoboxCRUDStore {
 
     return Promise.resolve()
       .then(() => {
-        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.SESSIONS));
+        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
       })
       .then(() => {
         this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.PRE_KEYS));
       })
       .then(() => {
-        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
+        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.SESSIONS));
       })
       .then(() => {
         return true;
