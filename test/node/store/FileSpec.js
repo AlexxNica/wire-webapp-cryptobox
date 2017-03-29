@@ -42,7 +42,7 @@ describe('cryptobox.store.File', () => {
   });
 
   describe('Identity', () => {
-    describe('save_identity', () => {
+    describe('Save & Load', () => {
       it('serializes an identity which can be deserialized', (done) => {
         const identity = Proteus.keys.IdentityKeyPair.new();
         const fingerprint = identity.public_key.fingerprint();
@@ -62,8 +62,8 @@ describe('cryptobox.store.File', () => {
   });
 
   describe('PreKey', () => {
-    describe('save_prekey', () => {
-      it('saves a PreKey which can then be loaded', (done) => {
+    describe('Save & Load', () => {
+      it('saves and loads a single PreKey', (done) => {
         const preKeyId = 0;
         const preKey = Proteus.keys.PreKey.new(preKeyId);
         fileStore.save_prekey(preKey)
@@ -76,6 +76,19 @@ describe('cryptobox.store.File', () => {
             done();
           })
           .catch(done.fail);
+      });
+
+      it('saves and loads multiple PreKeys', (done) => {
+        const preKeys = [
+          Proteus.keys.PreKey.new(0),
+          Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID)
+        ];
+
+        fileStore.save_prekeys(preKeys)
+          .then(function(savedPreKeys) {
+            expect(savedPreKeys.length).toBe(preKeys.length);
+            done();
+          });
       });
     });
   });
