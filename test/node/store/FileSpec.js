@@ -63,12 +63,16 @@ describe('cryptobox.store.File', () => {
 
   describe('PreKey', () => {
     describe('save_prekey', () => {
-      it('saves a PreKey', (done) => {
+      it('saves a PreKey which can then be loaded', (done) => {
         const preKeyId = 0;
         const preKey = Proteus.keys.PreKey.new(preKeyId);
         fileStore.save_prekey(preKey)
           .then((savedPreKey) => {
             expect(savedPreKey.key_id).toBe(preKeyId);
+            return fileStore.load_prekey(preKeyId)
+          })
+          .then((loadedPreKey) => {
+            expect(loadedPreKey.key_id).toBe(preKeyId);
             done();
           })
           .catch(done.fail);
