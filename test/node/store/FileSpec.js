@@ -23,6 +23,7 @@ const Proteus = require('wire-webapp-proteus');
 
 // gulp test_node --file "node/store/FileSpec.js"
 describe('cryptobox.store.File', () => {
+  // TODO: Use "fs.mkdtemp"
   const storagePath = `${__dirname}/test`;
   let fileStore = undefined;
 
