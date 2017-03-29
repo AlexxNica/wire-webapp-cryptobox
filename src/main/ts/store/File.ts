@@ -98,7 +98,7 @@ export default class File extends CryptoboxCRUDStore {
       fs.readFile(file, {encoding: "utf8", flag: "r"}, function (error, data) {
         if (error) {
           if (error.code === 'ENOENT') {
-            let message: string = `Record "${primary_key}" from file "${file}" could not be found.`;
+            const message: string = `Record "${primary_key}" from file "${file}" could not be found.`;
             reject(new RecordNotFoundError(message));
           } else {
             reject(error);
@@ -109,6 +109,30 @@ export default class File extends CryptoboxCRUDStore {
           const record: SerialisedRecord = new SerialisedRecord(serialised, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
           resolve(record);
         }
+      });
+    });
+  }
+
+  /**
+   * @override
+   */
+  read_all(store_name: string): Promise<SerialisedRecord[]> {
+    const directory: string = path.normalize(`${this.storagePath}/${store_name}`);
+
+    return new Promise((resolve) => {
+      fs.readdir(directory, (error, files) => {
+        const recordNames = files.map((file) => {
+          return path.basename(file, path.extname(file));
+        });
+
+        const promises = recordNames.map((primary_key) => {
+          return this.read(store_name, primary_key);
+        });
+
+        Promise.all(promises)
+          .then((records: SerialisedRecord[]) => {
+            resolve(records);
+          });
       });
     });
   }

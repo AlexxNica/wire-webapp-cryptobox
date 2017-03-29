@@ -61,7 +61,22 @@ describe('cryptobox.store.File', () => {
     });
   });
 
-  describe('Session', () => {
+  describe('PreKey', () => {
+    describe('save_prekey', () => {
+      it('saves a PreKey', (done) => {
+        const preKeyId = 0;
+        const preKey = Proteus.keys.PreKey.new(preKeyId);
+        fileStore.save_prekey(preKey)
+          .then((savedPreKey) => {
+            expect(savedPreKey.id).toBe(preKeyId);
+            done();
+          })
+          .catch(done.fail);
+      });
+    });
+  });
+
+  xdescribe('Session', () => {
     describe('save_session', () => {
       it('saves and loads a session', (done) => {
         const alice = new cryptobox.Cryptobox(fileStore, 1);

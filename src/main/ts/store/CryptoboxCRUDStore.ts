@@ -29,6 +29,8 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
 
   abstract read(store_name: string, primary_key: string): Promise<SerialisedRecord>;
 
+  abstract read_all(store_name: string): Promise<SerialisedRecord[]>;
+
   abstract update(store_name: string, primary_key: string, changes: SerialisedUpdate): Promise<string>;
 
   delete_prekey(prekey_id: number): Promise<number> {
@@ -71,8 +73,21 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
     });
   }
 
-  load_prekeys(): Promise<Array<Proteus.keys.PreKey>> {
-    return undefined;
+  load_prekeys(): Promise<Proteus.keys.PreKey[]> {
+    return Promise.resolve()
+      .then(() => {
+        return this.read_all(CryptoboxCRUDStore.STORES.PRE_KEYS);
+      })
+      .then((records: SerialisedRecord[]) => {
+        const preKeys: Proteus.keys.PreKey[] = [];
+
+        records.forEach((record: SerialisedRecord) => {
+          let preKey: Proteus.keys.PreKey = Proteus.keys.PreKey.deserialise(record.serialised);
+          preKeys.push(preKey);
+        });
+
+        return preKeys;
+      });
   }
 
   save_identity(identity: Proteus.keys.IdentityKeyPair): Promise<Proteus.keys.IdentityKeyPair> {
@@ -93,8 +108,15 @@ export abstract class CryptoboxCRUDStore implements CryptoboxStore {
       });
   }
 
-  save_prekeys(pre_keys: Array<Proteus.keys.PreKey>): Promise<Array<Proteus.keys.PreKey>> {
-    return undefined;
+  save_prekeys(pre_keys: Proteus.keys.PreKey[]): Promise<Proteus.keys.PreKey[]> {
+    const promises = pre_keys.map((pre_key) => {
+      return this.save_prekey(pre_key);
+    });
+
+    return Promise.all(promises)
+      .then(() => {
+        return pre_keys;
+      });
   }
 
   create_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
