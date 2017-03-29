@@ -41,21 +41,44 @@ describe('cryptobox.store.File', () => {
     });
   });
 
-  describe('save_identity', () => {
-    it('serializes an identity which can be deserialized', (done) => {
-      const identity = Proteus.keys.IdentityKeyPair.new();
-      const fingerprint = identity.public_key.fingerprint();
+  describe('Identity', () => {
+    describe('save_identity', () => {
+      it('serializes an identity which can be deserialized', (done) => {
+        const identity = Proteus.keys.IdentityKeyPair.new();
+        const fingerprint = identity.public_key.fingerprint();
 
-      fileStore.save_identity(identity)
-        .then((local_identity) => {
-          expect(local_identity).toBeDefined();
-          return fileStore.load_identity();
-        })
-        .then((loaded_identity) => {
-          expect(loaded_identity.public_key.fingerprint()).toBe(fingerprint);
-          done();
-        })
-        .catch(done.fail);
-    })
+        fileStore.save_identity(identity)
+          .then((local_identity) => {
+            expect(local_identity).toBeDefined();
+            return fileStore.load_identity();
+          })
+          .then((loaded_identity) => {
+            expect(loaded_identity.public_key.fingerprint()).toBe(fingerprint);
+            done();
+          })
+          .catch(done.fail);
+      })
+    });
+  });
+
+  describe('Session', () => {
+    describe('save_session', () => {
+      it('saves and loads a session', (done) => {
+        const alice = new cryptobox.Cryptobox(fileStore, 1);
+        const sessionId = 'session_with_bob';
+
+        done();
+
+        // const bob = Proteus.keys.IdentityKeyPair.new();
+        // const preKey = new Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+        // const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+        //
+        // alice.init()
+        //   .then(function(allPreKeys) {
+        //     expect(allPreKeys.length).toBe(1);
+        //     done();
+        //   });
+      })
+    });
   });
 });

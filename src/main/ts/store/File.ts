@@ -14,6 +14,9 @@ export default class File extends CryptoboxCRUDStore {
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: "cryptobox.store.File"});
   }
 
+  /**
+   * @override
+   */
   create(store_name: string, primary_key: string, record: SerialisedRecord): Promise<string> {
     this.logger.log(`Creating record "${primary_key}" in directory "${store_name}"...`, record);
     const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
@@ -52,12 +55,17 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
+  /**
+   * @override
+   */
   update(store_name: string, primary_key: string, changes: SerialisedUpdate): Promise<string> {
     const updatedRecord = new SerialisedRecord(changes.serialised, primary_key);
     return this.create(store_name, primary_key, updatedRecord);
   }
 
-  // TODO: Recursive directory creation is not yet implemented.
+  /**
+   * @override
+   */
   init(storagePath: string): Promise<CryptoboxCRUDStore> {
     this.storagePath = path.normalize(storagePath);
 
@@ -78,6 +86,9 @@ export default class File extends CryptoboxCRUDStore {
       });
   }
 
+  /**
+   * @override
+   */
   read(store_name: string, primary_key: string): Promise<SerialisedRecord> {
     this.logger.log(`Reading record with primary key "${primary_key}" from directory "${store_name}"...`);
     const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.txt`);
@@ -96,6 +107,9 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
+  /**
+   * @override
+   */
   delete(store_name: string, primary_key: string): Promise<string> {
     this.logger.log(`Deleting record with primary key "${primary_key}" in directory "${store_name}"...`);
     const file: string = path.normalize(`${this.storagePath}/${store_name}/${primary_key}.json`);
@@ -144,6 +158,9 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
+  /**
+   * @override
+   */
   delete_all(): Promise<boolean> {
     const directory: string = this.storagePath;
 

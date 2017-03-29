@@ -46,7 +46,7 @@ export class Cryptobox extends EventEmitter {
     this.store = cryptoBoxStore;
     this.pk_store = new ReadOnlyStore(this.store);
 
-    let storageEngine: string = (<any>cryptoBoxStore).constructor.name;
+    const storageEngine: string = (<any>cryptoBoxStore).constructor.name;
     this.logger.log(`Constructed Cryptobox. Minimum amount of PreKeys is "${minimumAmountOfPreKeys}". Storage engine is "${storageEngine}".`);
   }
 
