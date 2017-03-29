@@ -105,48 +105,57 @@ export default class File extends CryptoboxCRUDStore {
     });
   }
 
-  private deleteDirectory(directory: string): Promise<string> {
+  // TODO: This function fails if the content not only contains files but also subdirectories.
+  private deleteDirectoryWithContent(directory: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      fs.rmdir(directory, (error) => {
+      fs.access(directory, error => {
         if (error) {
-          return reject(error);
+          if (error.code === 'ENOENT') {
+            resolve(true);
+          } else {
+            reject(error);
+          }
         } else {
-          return resolve(directory);
+          fs.readdir(directory, (error, files) => {
+            if (error) {
+              reject(error);
+            } else {
+              Promise.all(files.map((file) => {
+                return fs.unlinkSync(path.join(directory, file));
+              })).then(() => {
+                fs.rmdir(directory, (error) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    resolve(true);
+                  }
+                });
+              }).catch(reject);
+            }
+          });
         }
       });
     });
   }
 
-  delete_all(currentDirectory: string): Promise<boolean> {
-    const directory: string = currentDirectory || this.storagePath;
+  delete_all(): Promise<boolean> {
+    const directory: string = this.storagePath;
 
-    return new Promise((resolve, reject) => {
-      fs.access(directory, error => {
-        if (error) {
-          return reject(error);
-        }
-        fs.readdir(directory, (error, files) => {
-          if (error) {
-            return reject(error);
-          }
-          Promise.all(files.map((file) => {
-            const stats = fs.lstatSync(path.join(directory, file));
-            if (stats.isFile()) {
-              return this.delete(directory, file);
-            } else {
-              // TODO: Delete directory (but delete files inside this directory too!)
-              return;
-            }
-          })).then(() => {
-            fs.rmdir(directory, error => {
-              if (error) {
-                return reject(error);
-              }
-              resolve();
-            });
-          }).catch(reject);
-        });
+    return Promise.resolve()
+      .then(() => {
+        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.SESSIONS));
+      })
+      .then(() => {
+        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.PRE_KEYS));
+      })
+      .then(() => {
+        this.deleteDirectoryWithContent(path.join(directory, CryptoboxCRUDStore.STORES.LOCAL_IDENTITY));
+      })
+      .then(() => {
+        return true;
+      })
+      .catch(() => {
+        return false;
       });
-    });
   }
 }
