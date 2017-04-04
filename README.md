@@ -1,5 +1,7 @@
 # Wire
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/wireapp/wire-webapp-cryptobox.svg)](https://greenkeeper.io/)
+
 This repository is part of the source code of Wire. You can find more information at [wire.com](https://wire.com) or by contacting opensource@wire.com.
 
 You can find the published source code at [github.com/wireapp](https://github.com/wireapp).
