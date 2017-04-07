@@ -17,58 +17,52 @@
  *
  */
 
-var args = require('yargs').argv;
-var assets = require('gulp-bower-assets');
-var babel = require('gulp-babel');
-var bower = require('gulp-bower');
-var browserSync = require('browser-sync').create();
-var clean = require('gulp-clean');
-var gulp = require('gulp');
-var gulpif = require('gulp-if');
-var gulpTypings = require('gulp-typings');
-var gutil = require('gulp-util');
-var Jasmine = require('jasmine');
-var merge = require('merge2');
-var ProgressPlugin = require('webpack/lib/ProgressPlugin');
-var replace = require('gulp-replace');
-var runSequence = require('run-sequence');
-var ts = require('gulp-typescript');
-var tsProjectNode = ts.createProject('tsconfig.json');
-var webpack = require('webpack');
+const args = require('yargs').argv;
+const assets = require('gulp-bower-assets');
+const babel = require('gulp-babel');
+const bower = require('gulp-bower');
+const browserSync = require('browser-sync').create();
+const clean = require('gulp-clean');
+const gulp = require('gulp');
+const gulpif = require('gulp-if');
+const gulpTypings = require('gulp-typings');
+const gutil = require('gulp-util');
+const jasmine = require('gulp-jasmine');
+const karma = require('karma');
+const merge = require('merge2');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
+const replace = require('gulp-replace');
+const runSequence = require('run-sequence');
+const ts = require('gulp-typescript');
+const tsProjectNode = ts.createProject('tsconfig.json');
+const webpack = require('webpack');
 
 // Aliases
 gulp.task('b', ['build']);
-gulp.task('bn', ['build_ts_node']);
 gulp.task('c', ['clean']);
 gulp.task('i', ['install']);
 gulp.task('t', ['test']);
-gulp.task('tb', ['test_browser']);
-gulp.task('tn', ['test_node']);
 
 // Tasks
-gulp.task('clean', ['clean_browser', 'clean_node'], function() {
+gulp.task('clean', ['clean_browser', 'clean_node'], () => {
 });
 
-gulp.task('clean_browser', function() {
-  return gulp.src('dist/window').pipe(clean());
-});
+gulp.task('clean_browser', () => gulp.src('dist/window').pipe(clean()));
 
-gulp.task('clean_node', function() {
-  return gulp.src('dist/commonjs').pipe(clean());
-});
+gulp.task('clean_node', () => gulp.src('dist/commonjs').pipe(clean()));
 
-gulp.task('build', function(done) {
+gulp.task('build', done => {
   runSequence('build_ts_node', 'build_ts_browser', done);
 });
 
-gulp.task('build_ts_browser', function(callback) {
-  var compiler = webpack(require('./webpack.config.js'));
+gulp.task('build_ts_browser', callback => {
+  const compiler = webpack(require('./webpack.config.js'));
 
-  compiler.apply(new ProgressPlugin(function(percentage, message) {
-    console.log(~~(percentage * 100) + '%', message);
+  compiler.apply(new ProgressPlugin((percentage, message) => {
+    console.log(`${~~(percentage * 100)}%`, message);
   }));
 
-  compiler.run(function(error) {
+  compiler.run(error => {
     if (error) {
       throw new gutil.PluginError('webpack', error);
     }
@@ -77,24 +71,24 @@ gulp.task('build_ts_browser', function(callback) {
   });
 });
 
-gulp.task('build_ts_node', function() {
-  var tsResult = tsProjectNode.src().pipe(tsProjectNode());
-  var disableLogging = Boolean(args.env === 'production');
+gulp.task('build_ts_node', () => {
+  const tsResult = tsProjectNode.src().pipe(tsProjectNode());
+  const disableLogging = Boolean(args.env === 'production');
 
-  gutil.log(gutil.colors.yellow('Disable log statements: ' + disableLogging));
+  gutil.log(gutil.colors.yellow(`Disable log statements: ${disableLogging}`));
 
   return merge([
     tsResult.dts
       .pipe(gulp.dest('dist/typings')),
     tsResult.js
       .pipe(replace('exports.default = {', 'module.exports = {'))
-      .pipe(gulpif(disableLogging, replace(/var Logdown[^\n]*/ig, '')))
+      .pipe(gulpif(disableLogging, replace(/(const|var) Logdown[^\n]*/ig, '')))
       .pipe(gulpif(disableLogging, replace(/[_]?this.logger[^\n]*/igm, '')))
       .pipe(gulp.dest('dist/commonjs'))
   ]);
 });
 
-gulp.task('default', ['dist'], function() {
+gulp.task('default', ['dist'], () => {
   gulp.watch('dist/**/*.*').on('change', browserSync.reload);
   gulp.watch('src/main/ts/**/*.*', ['build']);
 
@@ -105,45 +99,37 @@ gulp.task('default', ['dist'], function() {
   });
 });
 
-gulp.task('dist', function(done) {
+gulp.task('dist', done => {
   runSequence('clean', 'install', 'build', done);
 });
 
-gulp.task('install', ['install_bower_assets', 'install_typings'], function() {
+gulp.task('install', ['install_bower_assets', 'install_typings'], () => {
 });
 
-gulp.task('install_bower', function() {
-  return bower({cmd: 'install'});
-});
+gulp.task('install_bower', () => bower({cmd: 'install'}));
 
-gulp.task('install_bower_assets', ['install_bower'], function() {
-  return gulp.src('bower_assets.json')
-    .pipe(assets({
-      prefix: function(name, prefix) {
-        return prefix + '/' + name;
-      }
-    }))
-    .pipe(gulp.dest('dist/lib'));
-});
+gulp.task('install_bower_assets', ['install_bower'], () => gulp.src('bower_assets.json')
+  .pipe(assets({
+    prefix(name, prefix) {
+      return `${prefix}/${name}`;
+    }
+  }))
+  .pipe(gulp.dest('dist/lib')));
 
-gulp.task('install_typings', function() {
-  return gulp.src('./typings.json')
-    .pipe(gulpTypings());
-});
+gulp.task('install_typings', () => gulp.src('./typings.json')
+  .pipe(gulpTypings()));
 
-gulp.task('test', function(done) {
+gulp.task('test', done => {
   runSequence('test_node', 'test_browser', done);
 });
 
 // gulp test_browser -file "yourspec"
-gulp.task('test_browser', function(done) {
-  var karma = require('karma');
-
+gulp.task('test_browser', done => {
   gutil.log(gutil.colors.yellow('Running tests in Google Chrome:'));
-  var file = process.argv[4];
+  const file = process.argv[4];
 
-  var server = new karma.Server({
-    configFile: __dirname + '/karma.conf.js',
+  const server = new karma.Server({
+    configFile: `${__dirname}/karma.conf.js`,
     files: [
       // Libraries
       {pattern: 'dist/lib/dynamic/**/*.js', included: true, served: true, nocache: true},
@@ -159,39 +145,23 @@ gulp.task('test_browser', function(done) {
   server.start();
 });
 
-gulp.task('test_node', function(done) {
+gulp.task('test_node', () => {
   gutil.log(gutil.colors.yellow('Running tests on Node.js:'));
 
-  var file = process.argv[4];
+  const file = process.argv[4];
 
-  var tests = [
-    'common/**/*Spec.js',
-    'node/**/*Spec.js'
+  let tests = [
+    'test/common/**/*Spec.js',
+    'test/node/**/*Spec.js'
   ];
 
   if (file) {
-    tests = [file]
+    tests = [`test/js/specs/${file}`]
   }
 
-  var jasmine = new Jasmine();
-
-  var config = {
-    random: true,
-    spec_dir: 'test',
-    spec_files: tests,
-    stopSpecOnExpectationFailure: true,
-  };
-
-  jasmine.loadConfig(config);
-
-  jasmine.onComplete(function(passed) {
-    if (passed) {
-      done();
-    }
-    else {
-      done(new Error('At least one spec has failed.'));
-    }
-  });
-
-  jasmine.execute();
+  return gulp.src(tests)
+    .pipe(jasmine({
+      random: true,
+      stopSpecOnExpectationFailure: true
+    }));
 });

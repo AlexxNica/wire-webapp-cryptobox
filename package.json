@@ -2,7 +2,7 @@
   "dependencies": {
     "dexie": "1.5.1",
     "wire-webapp-lru-cache": "2.0.0",
-    "wire-webapp-proteus": "5.0.0"
+    "wire-webapp-proteus": "5.1.0"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
@@ -15,12 +15,12 @@
     "gulp-concat": "^2.6.0",
     "gulp-eslint": "^3.0.1",
     "gulp-if": "^2.0.2",
+    "gulp-jasmine": "^2.4.1",
     "gulp-replace": "^0.5.4",
-    "gulp-typescript": "^3.0.1",
+    "gulp-typescript": "3.1.6",
     "gulp-typings": "^2.0.4",
     "gulp-util": "^3.0.7",
     "gutil": "^1.6.4",
-    "jasmine": "^2.5.3",
     "karma": "~1.5.0",
     "karma-chrome-launcher": "~2.0.0",
     "karma-jasmine": "~1.1.0",
@@ -28,7 +28,7 @@
     "merge2": "^1.0.2",
     "run-sequence": "^1.2.2",
     "typescript": "^2.1.4",
-    "webpack": "2.3.0",
+    "webpack": "2.3.3",
     "yargs": "^6.6.0"
   },
   "license": "GPL-3.0",
@@ -39,12 +39,15 @@
     "url": "git://github.com/wireapp/wire-webapp-cryptobox.git"
   },
   "scripts": {
-    "build": "npm run prepublish",
-    "prepublish": "gulp dist --env production && npm test",
+    "dist": "gulp dist --env production",
+    "lint": "echo \"No linting specified\" && exit 0",
+    "preversion": "yarn lint && yarn dist && yarn test",
+    "version": "yarn dist && git add dist/**/*",
+    "postversion": "git push && git push --tags",
     "self_test_node": "node dist/index.js",
     "start": "gulp",
-    "test": "npm run self_test_node && gulp test"
+    "test": "yarn self_test_node && gulp test"
   },
-  "typings": "dist/typings/wire-webapp-cryptobox.d.ts",
-  "version": "4.0.1"
+  "types": "dist/typings/wire-webapp-cryptobox.d.ts",
+  "version": "5.1.0"
 }
